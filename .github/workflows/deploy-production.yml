@@ -167,3 +167,67 @@ jobs:
       - name: Deploy finished client version
         id: deployment
         uses: actions/deploy-pages@v4
+
+  smoke:
+    name: Verify public release
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Check live Pages output
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://thisismynamenot.github.io/Claude'
+          LIVE='/tmp/live-index.html'
+
+          ready=0
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error --location \
+              --header 'Cache-Control: no-cache' \
+              "$BASE/?release=${GITHUB_SHA}&attempt=$attempt" -o "$LIVE"; then
+              if grep -q '980c885d-d4c7-4426-8ae4-0c5f51755390' "$LIVE"; then
+                ready=1
+                break
+              fi
+            fi
+            sleep 5
+          done
+          test "$ready" -eq 1
+
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          source = Path('/tmp/live-index.html').read_text(encoding='utf-8')
+
+          class VisibleText(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+              def handle_data(self, data):
+                  self.parts.append(data)
+
+          parser = VisibleText()
+          parser.feed(source)
+          text = ' '.join(' '.join(parser.parts).split())
+          for phrase in (
+              'Střecha musí obstát v čase.',
+              'Práce na objektech, které Praha zná.',
+              'Dohledatelné zakázky.',
+          ):
+              if phrase not in text:
+                  raise SystemExit(f'Live site is missing: {phrase}')
+          PY
+
+          for path in \
+            'favicon.svg' \
+            'ochrana-osobnich-udaju.html' \
+            'assets/hero-prague.jpg' \
+            'assets/roof-detail.jpg' \
+            'assets/roof-work.jpg' \
+            'assets/national-museum.jpg' \
+            'assets/prague-market.jpg' \
+            'assets/fonts/inter-400.woff2' \
+            'assets/fonts/cormorant-garamond-400.woff2'; do
+            curl --fail --silent --show-error --location --output /dev/null "$BASE/$path"
+          done
