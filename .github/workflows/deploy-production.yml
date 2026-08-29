@@ -78,12 +78,63 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'Střecha musí obstát v čase.' _site/index.html
-          grep -q 'Práce na objektech, které Praha zná.' _site/index.html
-          grep -q 'Dohledatelné zakázky.' _site/index.html
-          grep -q 'ee327944-8098-4f6f-9000-dd8964baa26b' _site/index.html
-          grep -q '980c885d-d4c7-4426-8ae4-0c5f51755390' _site/index.html
-          ! grep -Eqi 'demo|produkční verze|soukromý redesign|heritage luxury concept' _site/index.html
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          source = Path('_site/index.html').read_text(encoding='utf-8')
+
+          class VisibleText(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+              def handle_data(self, data):
+                  self.parts.append(data)
+
+          parser = VisibleText()
+          parser.feed(source)
+          text = ' '.join(' '.join(parser.parts).split())
+
+          required_phrases = [
+              'Střecha musí obstát v čase.',
+              'Práce na objektech, které Praha zná.',
+              'Dohledatelné zakázky.',
+          ]
+          for phrase in required_phrases:
+              if phrase not in text:
+                  raise SystemExit(f'Missing rendered copy: {phrase}')
+
+          banned_phrases = [
+              'demo',
+              'produkční verze',
+              'soukromý redesign',
+              'heritage luxury concept',
+          ]
+          lower_text = text.lower()
+          for phrase in banned_phrases:
+              if phrase in lower_text:
+                  raise SystemExit(f'Prototype language remains: {phrase}')
+
+          required_markers = [
+              'ee327944-8098-4f6f-9000-dd8964baa26b',
+              '980c885d-d4c7-4426-8ae4-0c5f51755390',
+              'assets/hero-prague.jpg',
+              'assets/roof-detail.jpg',
+          ]
+          for marker in required_markers:
+              if marker not in source:
+                  raise SystemExit(f'Missing production marker: {marker}')
+
+          forbidden_hotlinks = [
+              'images.unsplash.com',
+              'commons.wikimedia.org',
+              'fonts.googleapis.com',
+              'fonts.gstatic.com',
+          ]
+          for host in forbidden_hotlinks:
+              if host in source:
+                  raise SystemExit(f'External asset hotlink remains: {host}')
+          PY
           grep -q 'noindex,nofollow' _site/index.html
           grep -q 'Disallow: /' _site/robots.txt
           touch _site/.nojekyll
