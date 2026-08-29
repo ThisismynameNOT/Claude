@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.conversion/**'
+      - '.conversion-src/**'
       - '.github/workflows/deploy-conversion.yml'
 
 permissions:
@@ -24,15 +24,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Restore production site bundle
+      - name: Restore and verify production sources
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p _site/assets/fonts
-          cat .conversion/site-{01..03}.b64 | tr -d '\n\r' | base64 --decode > /tmp/site.tar.gz
-          echo 'ea342e72e3a8b82c985105ed3206f7ecbdb80630a235a589ceef31abeaae983a  /tmp/site.tar.gz' | sha256sum -c -
-          tar -xzf /tmp/site.tar.gz -C _site
-          echo 'c2e96dbd2c32c404d770dbab7daf26d9f067d9ce19264c8d3b755c977ba7cf5d  _site/index.html' | sha256sum -c -
+          cp .conversion-src/*.html _site/
+          cp .conversion-src/*.css _site/
+          cp .conversion-src/site.js .conversion-src/robots.txt .conversion-src/favicon.svg _site/
+          cat <<'SUMS' | sha256sum -c -
+          c2e96dbd2c32c404d770dbab7daf26d9f067d9ce19264c8d3b755c977ba7cf5d  _site/index.html
+          830e9ba878b2e28b9d965653bddc19d7f1f831d174a296b4503ee2e43bf51924  _site/realizace.html
+          08339837c6e47a4ec2be71ae1e02c2cba73d087587fbf8f7395826d6931b3041  _site/sluzby.html
+          defcc49a04bddfae652d171ce627a8585fb6b79feff15f327f1bfe9164158351  _site/reference.html
+          47410b8b4ab3d29c94a1e8746805e0723420a64382d709a4a12801dde757f280  _site/firma.html
+          7fa5b49d42c0d25061b379cd22dcea3cc1daf4fd9adb93a6222d78e350170a86  _site/kontakt.html
+          b53927295a536314489ac9f58e7e952a8c96e7835800bc59296d20fba5c21f7c  _site/ochrana-osobnich-udaju.html
+          e34d9af7da8116c3e520ea10780d84eb3a3956800e637b1fd4693645ae35cace  _site/site.js
+          331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1  _site/robots.txt
+          86a57f320dbdcf2df592e031e40e159da9141e52bcbd48e304b1a80eb463db57  _site/favicon.svg
+          c4b1b8879cc9b92b3c1c91b29ee35e50d4ac30f25465869678ecba45fd5ecbec  _site/styles.css
+          7624a668e991710a128bd8f7cdfce22f3373e29329a2225c52e05fbde56bdae9  _site/styles-base.css
+          484affa965f8436543f12cce25dc0347bb75d66549b013475547de0d980d85db  _site/styles-components.css
+          6a1a3ff52fe36b3ca522ae193dd866e2556aaa74099f70b9c086555f10189dbd  _site/styles-responsive.css
+          SUMS
 
       - name: Install self-hosted typefaces
         shell: bash
@@ -91,9 +106,7 @@ jobs:
                   if t=='img' and 'src' in d: self.img.append(d['src'])
 
           for page in pages:
-              path=root/page
-              if not path.exists(): raise SystemExit(f'Missing page: {page}')
-              source=path.read_text(encoding='utf-8')
+              source=(root/page).read_text(encoding='utf-8')
               parser=P(); parser.feed(source)
               text=' '.join(' '.join(parser.parts).split())
               if 'noindex,nofollow' not in source: raise SystemExit(f'Staging index protection missing: {page}')
@@ -109,17 +122,18 @@ jobs:
               for src in parser.img:
                   if not (root/src).exists(): raise SystemExit(f'Missing image {src} in {page}')
 
-          idx=(root/'index.html').read_text(encoding='utf-8')
-          p=P(); p.feed(idx); home=' '.join(' '.join(p.parts).split())
+          parser=P(); parser.feed((root/'index.html').read_text(encoding='utf-8'))
+          home=' '.join(' '.join(parser.parts).split())
           if len(home.split()) >= 600: raise SystemExit('Homepage is still too long')
           for phrase in ['Střecha musí obstát v čase.','Nejdřív potřebujeme vědět co se děje.','47','Poptat prohlídku','+420 732 282 409']:
               if phrase not in home: raise SystemExit(f'Missing homepage conversion copy: {phrase}')
+          js=(root/'site.js').read_text(encoding='utf-8')
           contact=(root/'kontakt.html').read_text(encoding='utf-8')
-          for marker in ['ee327944-8098-4f6f-9000-dd8964baa26b','980c885d-d4c7-4426-8ae4-0c5f51755390','roofForm']:
-              if marker not in contact and marker not in (root/'site.js').read_text(encoding='utf-8'):
-                  raise SystemExit(f'Missing Wix form marker: {marker}')
+          for marker in ['ee327944-8098-4f6f-9000-dd8964baa26b','980c885d-d4c7-4426-8ae4-0c5f51755390']:
+              if marker not in js: raise SystemExit(f'Missing Wix integration marker: {marker}')
+          if 'roofForm' not in contact: raise SystemExit('Contact form missing')
           for host in ['images.unsplash.com','commons.wikimedia.org','fonts.googleapis.com','fonts.gstatic.com']:
-              for f in pages+['styles.css','site.js']:
+              for f in pages+['styles.css','styles-base.css','styles-components.css','styles-responsive.css','site.js']:
                   if host in (root/f).read_text(encoding='utf-8'):
                       raise SystemExit(f'External asset hotlink remains in source: {host} / {f}')
           PY
@@ -130,9 +144,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TOKEN_RESPONSE="$(curl --fail --silent --show-error --location 'https://www.wixapis.com/oauth2/token' \
-            --header 'Content-Type: application/json' \
-            --data '{"clientId":"ee327944-8098-4f6f-9000-dd8964baa26b","grantType":"anonymous"}')"
+          TOKEN_RESPONSE="$(curl --fail --silent --show-error --location 'https://www.wixapis.com/oauth2/token' --header 'Content-Type: application/json' --data '{"clientId":"ee327944-8098-4f6f-9000-dd8964baa26b","grantType":"anonymous"}')"
           ACCESS_TOKEN="$(printf '%s' "$TOKEN_RESPONSE" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token", ""))')"
           test -n "$ACCESS_TOKEN"
 
@@ -173,7 +185,7 @@ jobs:
             sleep 5
           done
           test "$ready" -eq 1
-          for page in index.html realizace.html sluzby.html reference.html firma.html kontakt.html ochrana-osobnich-udaju.html styles.css site.js favicon.svg; do
+          for page in index.html realizace.html sluzby.html reference.html firma.html kontakt.html ochrana-osobnich-udaju.html styles.css styles-base.css styles-components.css styles-responsive.css site.js favicon.svg; do
             curl --fail --silent --show-error --location --output /dev/null "$BASE/$page"
           done
           for asset in hero-prague roof-detail roof-work national-museum prague-market; do
