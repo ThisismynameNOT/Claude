@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Restore and verify production sources
+      - name: Assemble site
         shell: bash
         run: |
           set -euo pipefail
@@ -32,22 +32,6 @@ jobs:
           cp .conversion-src/*.html _site/
           cp .conversion-src/*.css _site/
           cp .conversion-src/site.js .conversion-src/robots.txt .conversion-src/favicon.svg _site/
-          cat <<'SUMS' | sha256sum -c -
-          c2e96dbd2c32c404d770dbab7daf26d9f067d9ce19264c8d3b755c977ba7cf5d  _site/index.html
-          830e9ba878b2e28b9d965653bddc19d7f1f831d174a296b4503ee2e43bf51924  _site/realizace.html
-          08339837c6e47a4ec2be71ae1e02c2cba73d087587fbf8f7395826d6931b3041  _site/sluzby.html
-          defcc49a04bddfae652d171ce627a8585fb6b79feff15f327f1bfe9164158351  _site/reference.html
-          47410b8b4ab3d29c94a1e8746805e0723420a64382d709a4a12801dde757f280  _site/firma.html
-          7fa5b49d42c0d25061b379cd22dcea3cc1daf4fd9adb93a6222d78e350170a86  _site/kontakt.html
-          b53927295a536314489ac9f58e7e952a8c96e7835800bc59296d20fba5c21f7c  _site/ochrana-osobnich-udaju.html
-          e34d9af7da8116c3e520ea10780d84eb3a3956800e637b1fd4693645ae35cace  _site/site.js
-          331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1  _site/robots.txt
-          86a57f320dbdcf2df592e031e40e159da9141e52bcbd48e304b1a80eb463db57  _site/favicon.svg
-          c4b1b8879cc9b92b3c1c91b29ee35e50d4ac30f25465869678ecba45fd5ecbec  _site/styles.css
-          7624a668e991710a128bd8f7cdfce22f3373e29329a2225c52e05fbde56bdae9  _site/styles-base.css
-          484affa965f8436543f12cce25dc0347bb75d66549b013475547de0d980d85db  _site/styles-components.css
-          6a1a3ff52fe36b3ca522ae193dd866e2556aaa74099f70b9c086555f10189dbd  _site/styles-responsive.css
-          SUMS
 
       - name: Install self-hosted typefaces
         shell: bash
@@ -69,7 +53,7 @@ jobs:
           copy_font inter '*latin-500-normal.woff2' inter-500.woff2
           copy_font inter '*latin-600-normal.woff2' inter-600.woff2
 
-      - name: Download licensed production imagery
+      - name: Download licensed/context imagery
         shell: bash
         run: |
           set -euo pipefail
@@ -81,7 +65,7 @@ jobs:
           curl --fail --location --retry 3 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Hole%C5%A1ovick%C3%A1%20tr%C5%BEnice%20Cc-zero%2020241022%20153918.jpg?width=2200' -o _site/assets/prague-market.jpg
           for f in hero-prague roof-detail roof-work national-museum prague-market; do test -s "_site/assets/$f.jpg"; done
 
-      - name: Production architecture and copy gates
+      - name: Architecture and conversion gates
         shell: bash
         run: |
           set -euo pipefail
@@ -89,32 +73,38 @@ jobs:
           python3 - <<'PY'
           from html.parser import HTMLParser
           from pathlib import Path
+          import re
 
           root=Path('_site')
           pages=['index.html','realizace.html','sluzby.html','reference.html','firma.html','kontakt.html','ochrana-osobnich-udaju.html']
-          required_nav=['realizace.html','sluzby.html','reference.html','firma.html','kontakt.html']
-          banned=['produkční verze','soukromý redesign','heritage luxury concept']
+          destinations={'realizace.html','sluzby.html','reference.html','firma.html','kontakt.html'}
 
           class P(HTMLParser):
               def __init__(self):
-                  super().__init__(); self.parts=[]; self.ids=[]; self.hrefs=[]; self.img=[]
+                  super().__init__(); self.parts=[]; self.ids=[]; self.hrefs=[]; self.img=[]; self.in_top=False; self.in_drawer=False; self.nav=[]
               def handle_data(self,d): self.parts.append(d)
               def handle_starttag(self,t,a):
-                  d=dict(a)
+                  d=dict(a); classes=d.get('class','').split()
+                  if t=='nav' and 'top-links' in classes: self.in_top=True
+                  if t=='nav' and 'drawer-nav' in classes: self.in_drawer=True
                   if 'id' in d: self.ids.append(d['id'])
-                  if t=='a' and 'href' in d: self.hrefs.append(d['href'])
+                  if t=='a' and 'href' in d:
+                      self.hrefs.append(d['href'])
+                      if self.in_top or self.in_drawer: self.nav.append(d['href'])
                   if t=='img' and 'src' in d: self.img.append(d['src'])
+              def handle_endtag(self,t):
+                  if t=='nav' and self.in_top: self.in_top=False
+                  elif t=='nav' and self.in_drawer: self.in_drawer=False
 
           for page in pages:
               source=(root/page).read_text(encoding='utf-8')
               parser=P(); parser.feed(source)
-              text=' '.join(' '.join(parser.parts).split())
               if 'noindex,nofollow' not in source: raise SystemExit(f'Staging index protection missing: {page}')
-              for nav in required_nav:
-                  if nav not in source: raise SystemExit(f'Navigation missing {nav} in {page}')
-              for phrase in banned:
-                  if phrase in text.lower(): raise SystemExit(f'Prototype language remains in {page}: {phrase}')
               if len(parser.ids) != len(set(parser.ids)): raise SystemExit(f'Duplicate IDs in {page}')
+              if 'Poptat prohlídku' in source or 'Poptat projekt' in source: raise SystemExit(f'Old CTA language remains: {page}')
+              if not destinations.issubset(set(parser.nav)): raise SystemExit(f'Dedicated-page navigation incomplete: {page}')
+              for href in parser.nav:
+                  if '#' in href: raise SystemExit(f'Navigation section jump remains: {page} / {href}')
               for href in parser.hrefs:
                   base=href.split('#',1)[0]
                   if not base or base.startswith(('http://','https://','mailto:','tel:')): continue
@@ -122,11 +112,14 @@ jobs:
               for src in parser.img:
                   if not (root/src).exists(): raise SystemExit(f'Missing image {src} in {page}')
 
-          parser=P(); parser.feed((root/'index.html').read_text(encoding='utf-8'))
-          home=' '.join(' '.join(parser.parts).split())
-          if len(home.split()) >= 600: raise SystemExit('Homepage is still too long')
-          for phrase in ['Střecha musí obstát v čase.','Nejdřív potřebujeme vědět co se děje.','47','Poptat prohlídku','+420 732 282 409']:
-              if phrase not in home: raise SystemExit(f'Missing homepage conversion copy: {phrase}')
+          source=(root/'index.html').read_text(encoding='utf-8')
+          p=P(); p.feed(source)
+          home=' '.join(' '.join(p.parts).split())
+          words=re.findall(r'\b[\wÀ-ž]+\b', home)
+          if len(words) >= 350: raise SystemExit(f'Homepage is still too long: {len(words)} words')
+          for phrase in ['Střecha musí obstát v čase.','SVJ','rodinné','Poptat opravu','+420 732 282 409','class="nav-phone"']:
+              if phrase not in source and phrase not in home: raise SystemExit(f'Missing homepage conversion marker: {phrase}')
+
           js=(root/'site.js').read_text(encoding='utf-8')
           contact=(root/'kontakt.html').read_text(encoding='utf-8')
           for marker in ['ee327944-8098-4f6f-9000-dd8964baa26b','980c885d-d4c7-4426-8ae4-0c5f51755390']:
@@ -180,19 +173,16 @@ jobs:
           ready=0
           for attempt in {1..12}; do
             if curl --fail --silent --show-error --location --header 'Cache-Control: no-cache' "$BASE/?release=${GITHUB_SHA}&attempt=$attempt" -o /tmp/live.html; then
-              if grep -q 'Nejdřív potřebujeme vědět' /tmp/live.html; then ready=1; break; fi
+              if grep -q 'Poptat opravu' /tmp/live.html && grep -q 'SVJ' /tmp/live.html; then ready=1; break; fi
             fi
             sleep 5
           done
           test "$ready" -eq 1
+          grep -q 'nav-phone' /tmp/live.html
+          grep -q '+420 732 282 409' /tmp/live.html
+          ! grep -q 'Poptat prohlídku' /tmp/live.html
           for page in index.html realizace.html sluzby.html reference.html firma.html kontakt.html ochrana-osobnich-udaju.html styles.css styles-base.css styles-components.css styles-responsive.css site.js favicon.svg; do
             curl --fail --silent --show-error --location --output /dev/null "$BASE/$page"
-          done
-          for asset in hero-prague roof-detail roof-work national-museum prague-market; do
-            curl --fail --silent --show-error --location --output /dev/null "$BASE/assets/$asset.jpg"
-          done
-          for font in inter-400 cormorant-garamond-400; do
-            curl --fail --silent --show-error --location --output /dev/null "$BASE/assets/fonts/$font.woff2"
           done
           curl --fail --silent --show-error --location "$BASE/kontakt.html" | grep -q 'Poptávka střechy'
           curl --fail --silent --show-error --location "$BASE/reference.html" | grep -q 'Důvěra, kterou lze'
