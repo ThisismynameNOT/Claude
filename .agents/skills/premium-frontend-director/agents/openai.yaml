@@ -1,0 +1,4 @@
+interface:
+  display_name: "Premium Frontend Director"
+  short_description: "Design, build, refine, and audit frontends"
+  default_prompt: "Use $premium-frontend-director to improve this frontend with its brand, function, accessibility, and performance in view."
