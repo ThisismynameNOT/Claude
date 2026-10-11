@@ -1,23 +1,20 @@
-# Implement a visual reference
+# Workflow: Implement Reference
 
-## Inputs
+**Activates when**: the user supplies a concrete visual reference — a screenshot, a Figma file, an existing site, a written spec — and wants it reproduced, not reinterpreted. "Implement this exactly," "build this from the screenshot," "match this design."
 
-Use the supplied screenshot, Figma file, reference route, tokens, target viewport, assets, and implementation constraints.
+This workflow inverts the normal priority order: **fidelity to the supplied reference outranks this Skill's own design-direction and default-avoidance guidance.** Don't apply the "avoid Inter/Fraunces as defaults" or "avoid 3-equal-column rows" guidance here if the reference itself uses them — reproducing the reference faithfully is the actual job.
 
-## Procedure
+## Steps
 
-1. Confirm the reference and target state. Note viewport, device scale, theme, content, and interaction state where visible.
-2. Inspect the existing project and available assets. Do not substitute a new style direction for a request to reproduce a reference.
-3. Extract observable geometry, typography, colors, spacing, image crop, layering, and interaction behavior. Label uncertain details.
-4. Implement using the existing stack and genuine/authorized assets. If a reference asset cannot be used, choose the closest permitted alternative and mark the difference.
-5. Render the implementation at the reference viewport and compare side by side. Fix material mismatches, then verify a narrow/wide adaptation and relevant keyboard state.
+1. Extract the reference's actual values, not an impression of them: exact or closely-matched colors, type (measure/compare against common faces if the exact one isn't named), spacing, breakpbehavior if visible, and interaction/motion if it's a live reference rather than a static image.
+2. Confirm scope: pixel-exact reproduction, or reproduction adapted to a different stack/framework while keeping the same visual result? If genuinely ambiguous, ask once; otherwise assume "same visual result, idiomatic implementation for the target stack."
+3. Build it against the project's actual stack and constraints ([references/frontend-engineering.md](../references/frontend-engineering.md)) — fidelity to the reference, not necessarily to the reference's original implementation technique.
+4. Still apply, even here: accessibility baseline ([references/accessibility-and-usability.md](../references/accessibility-and-usability.md)) and the production-grade engineering baseline — a faithfully reproduced design still needs semantic markup, keyboard operability, and working forms, none of which a static screenshot can show. If the reference is visibly inaccessible (e.g., unreadable contrast), say so and ask whether to preserve it exactly or correct it.
+5. Verify against the reference directly — side-by-side at matching viewport, not just "looks about right."
+6. **Respect copyright and asset ownership.** Don't reproduce a reference that's a competitor's branded design as if it were this user's own brand; flag that distinction if it looks like it might be happening.
 
-## Deliver
+## Acceptance criteria
 
-Provide the implementation, exact states/widths compared, material discrepancies, and any details that could not be verified from the reference.
-
-## Acceptance
-
-- The implementation matches the supplied reference's hierarchy, spacing, type, imagery, and visible states as closely as evidence allows.
-- No unsupported design embellishment is added.
-- Reproduction fidelity and responsive adaptation are both checked where tools permit.
+- The build matches the supplied reference's actual values, not this Skill's general-purpose defaults.
+- Accessibility and engineering baselines still hold even though visual direction deferred to the reference.
+- Any place the implementation had to deviate from the reference (because of inaccessibility, a different stack, or ambiguity in the source) is stated explicitly, not silently decided.

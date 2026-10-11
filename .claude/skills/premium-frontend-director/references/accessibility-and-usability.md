@@ -1,31 +1,47 @@
-# Accessibility and usability
+# Accessibility and Usability
 
-## Target and honesty
+Accessibility is a dedicated audit pass (see [review-and-audit.md](review-and-audit.md) and [workflows/audit.md](../workflows/audit.md)), not a running commentary during design. Checking it constantly while designing tends to produce timid, over-cautious layouts; checking it rigorously at a dedicated stage catches real issues without flattening the work.
 
-Use WCAG 2.2 Level AA as a practical target when applicable. This is a target, not an automatic conformance claim. A successful automated scan does not prove conformance; combine automated checks with manual keyboard, zoom/reflow, content, and assistive-technology checks appropriate to the product.
+## Baseline target
 
-## Semantics and navigation
+WCAG 2.2 AA across the board; AAA contrast target for hero/display copy where feasible.
 
-- Use native headings, landmarks, lists, buttons, links, labels, and form controls.
-- Keep heading levels and page structure meaningful.
-- Use ARIA only when native HTML does not provide the necessary semantics; match role, state, keyboard behavior, and focus model.
-- Keep a visible focus indicator and a logical focus order. Do not remove outlines without an equivalent.
-- Support keyboard operation for all essential controls. For custom widgets, follow the relevant WAI-ARIA APG keyboard pattern instead of improvising.
-- Ensure focus is not obscured by sticky headers, dialogs, or overlays.
+## Structural
 
-## Content and controls
+- Semantic HTML first: real `<button>`, `<a>`, `<nav>`, `<main>`, `<header>`, `<form>` elements — not `<div onClick>` standing in for interactive controls.
+- One `<h1>` per page; heading levels don't skip (no `<h2>` straight to `<h4>`).
+- Landmark regions (`<main>`, `<nav>`, `<footer>`) so screen-reader users can jump between sections.
+- A visible skip-to-content link as the first focusable element.
 
-- Give controls clear accessible names and state. Make the purpose clear in text, not icon shape alone.
-- Associate labels, instructions, and errors with form fields. Identify errors and explain how to correct them.
-- Provide status feedback for important async actions without stealing focus unnecessarily.
-- Preserve text zoom/reflow and user settings. Do not communicate status by color alone.
-- Provide keyboard alternatives to dragging and pointer-only interactions where appropriate.
-- Respect reduced-motion preferences; avoid flashes and distracting movement.
+## Keyboard
 
-## Usability and states
+- Every interactive element reachable and operable via keyboard alone, in a logical tab order that matches visual order.
+- Visible focus states on everything focusable — distinct from hover, never `outline: none` without a replacement.
+- Modals/drawers trap focus while open and return focus to the trigger on close; Escape closes them.
+- Custom components (tabs, comboboxes, menus) implement the expected keyboard pattern (arrow keys, Home/End, type-ahead) and correct ARIA roles — don't reinvent a pattern a native element or an accessible library already solves correctly.
 
-Make the main task and next action clear. Prevent avoidable errors, preserve user input when validation fails, and provide recovery for destructive or irreversible actions. Design loading, empty, success, error, disabled, and unavailable states when the task can reach them.
+## Screen reader and assistive tech
 
-## Practical review
+- Meaningful `alt` text on informative images; empty `alt=""` on purely decorative ones.
+- Form inputs have associated, visible `<label>` elements (not placeholder-as-label).
+- Error messages are programmatically associated with their field (`aria-describedby`) and announced.
+- Dynamic content changes (toasts, live search results, loading completion) use `aria-live` appropriately — not every update, just the ones a sighted user would also notice.
+- Icon-only buttons have an accessible name (`aria-label` or visually-hidden text).
 
-Test keyboard-only navigation, focus visibility and order, labels and errors, zoom/reflow, contrast, touch interaction, reduced motion, and representative assistive technology when available. Record tools and limitations. Use [WCAG 2.2](https://www.w3.org/TR/WCAG22/) as the normative success-criteria reference and [WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) for informative widget patterns.
+## Touch and pointer
+
+- Touch targets at least 44×44px (iOS) / 48×48dp (Material) with adequate spacing between adjacent targets.
+- Hover-only affordances have a touch/focus equivalent — nothing is *only* reachable by hovering.
+- Gesture-only interactions (swipe-to-dismiss, drag-to-reorder) have a non-gesture alternative.
+
+## Cognitive load and usability
+
+- One primary action per view/section; secondary actions visually subordinate.
+- Error messages are specific and actionable ("Card number must be 16 digits" not "Invalid input").
+- Destructive actions (delete, cancel subscription) require confirmation or are easily undoable.
+- Forms show inline validation as the user completes fields, not only on submit.
+- Loading and empty states explain what's happening and what to do next rather than leaving a blank or ambiguous screen.
+
+## Usability isn't separate from accessibility
+
+A usability failure (a confusing error message, an undiscoverable primary action, inconsistent navigation) degrades the experience for everyone and disproportionately for users already working harder to use the interface. Treat the two as one review pass, run together in [workflows/audit.md](../workflows/audit.md).

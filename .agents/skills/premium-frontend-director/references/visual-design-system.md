@@ -1,41 +1,26 @@
-# Visual design system
+# Visual Design System and Components
 
-## Build a coherent system
+Every component should read as part of one coherent design language defined by the design brief (tokens for color, type, radius, spacing, shadow, motion) — not as a grab-bag of defaults from whatever library was convenient.
 
-Create or extend a small set of decisions that the interface can reuse: color roles, type roles, spacing rhythm, container and grid rules, shape/border treatment, elevation, icon style, and motion tokens when needed. Store them in the project's existing system or format. Avoid parallel token systems that disagree.
+Component libraries (shadcn/ui, Radix, Material, Fluent, Carbon, Polaris, etc.) are acceptable and often correct, especially for Operate-mode surfaces where native expectations and accessibility matter more than novelty. **Never ship a component library's out-of-the-box visual defaults unexamined** on a Persuade/Experience surface that needs a distinctive identity — adapt radii, color, shadow, and type to the project's tokens.
 
-Start with the actual information and task, then choose the right hierarchy. A system should make repeated decisions consistent while allowing a one-off composition where it improves clarity.
+## Coverage checklist (apply what's relevant to the project)
 
-## Composition and hierarchy
+- **Navigation** — primary nav, mobile nav pattern, in-page anchors/table of contents for long Read content, breadcrumbs for deep Operate hierarchies.
+- **Buttons** — primary/secondary/tertiary hierarchy, loading state, disabled state, real press feedback (see motion-and-interactions.md).
+- **Cards** — consistent internal padding/rhythm, a clear clickable area if the whole card is a link, hover state that doesn't fight the page's motion budget.
+- **Forms** — label placement, inline validation, error messaging (see also content-and-brand-authenticity.md for copy), accessible required-field marking, logical tab order.
+- **Modals and drawers** — focus trap, Escape-to-close, click-outside behavior, centered (modals) vs. edge-anchored (drawers) with the animation origin to match.
+- **Dropdowns, select, combobox** — keyboard operable (arrow keys, type-ahead, Escape), anchored and positioned to stay on-screen.
+- **Galleries and carousels** — real keyboard/swipe support, visible position indicator, pause-on-hover/focus for autoplay, and an escape from autoplay entirely for accessibility.
+- **Tabs and accordions** — correct ARIA roles (`tablist`/`tab`/`tabpanel`, `button[aria-expanded]`), content reachable without JS where feasible.
+- **Search and filters** — visible active-filter state, an obvious way to clear filters, empty-result state that suggests a next step.
+- **Tables** — for dense data, a real table element or table-semantics component (not div-grids pretending to be tables) with sortable-column affordances where relevant.
+- **Notifications/toasts** — don't steal focus, auto-dismiss with a reasonable timeout or persist for errors, announce via `aria-live` for screen readers.
+- **Loading states** — skeletons that match the real content's shape, not a generic spinner for anything that takes longer than ~300ms; nothing longer than ~300ms with zero loading indication.
+- **Empty states** — explain why it's empty and what to do next, not just "No results."
+- **Error states** — specific, actionable, and in the product's own voice — see content-and-brand-authenticity.md.
 
-- Make the primary action or content unmistakable.
-- Group related information; separate unrelated priorities.
-- Vary scale, placement, and rhythm when meaning calls for it.
-- Use whitespace intentionally; avoid empty space that hides needed controls.
-- Use cards only when containment or comparison is meaningful.
-- Preserve reading order across visual rearrangement.
-- Give repeated sections a common rhythm without making every section identical.
+## Consistency check
 
-## Component language
-
-Define component states, not just their default appearance: idle, hover, focus, pressed, selected, disabled, loading, success, empty, and error as applicable. Keep labels, icons, border treatment, spacing, and state transitions consistent. Use the established component library when it fits; customize visual defaults where needed without breaking its accessibility contract.
-
-| Component family | Design and behavior checks |
-|---|---|
-| Navigation, menus, buttons, links | Distinguish actions from navigation; show current location and focus; make mobile and keyboard paths complete. |
-| Forms, search, filters | Label inputs; retain user values through errors; make applied filters and clear/reset actions visible; persist state in the URL when useful. |
-| Cards, tables, results | Use containment only when meaningful; keep table headers, sort state, row actions, and dense-data reflow understandable. |
-| Dialogs, drawers, dropdowns | Define opening/closing, focus entry/return, Escape behavior, outside click behavior, and scroll handling. |
-| Tabs, accordions | Keep selected/expanded state visible and keyboard behavior consistent with the chosen pattern. |
-| Galleries, carousels | Provide controls and a clear current position; avoid autoplay unless required and controllable; retain touch and keyboard access. |
-| Notifications, loading, empty, error states | Communicate what happened, what is happening, or what to do next; use non-color cues and accessible status announcements where appropriate. |
-
-Prefer native HTML for common controls. For complex widgets, use a mature accessible component implementation or follow an established keyboard pattern. See [accessibility and usability](accessibility-and-usability.md).
-
-## Images and visual assets
-
-Use images to communicate relevant content, not to fill a decorative slot. Match crop and aspect ratio to subject matter. Set dimensions or aspect ratios to reduce layout shifts. Verify usage rights and provenance; use a clearly marked placeholder when source media is unavailable.
-
-## Distinction from a redesign
-
-For a refinement, preserve the incumbent visual language except within scope. For a redesign, inspect the incumbent to understand product content and behavior, then choose a replacement direction that fits the brief. Do not blend in fragments of the old look simply because they already exist.
+Before calling a component system done, scan for: multiple one-off button styles that should be the same component, inconsistent corner radii across cards/inputs/buttons, spacing values that don't belong to the declared scale, and icon sets mixed from more than one family.

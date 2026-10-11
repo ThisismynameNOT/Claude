@@ -1,35 +1,36 @@
-# Layout and responsive behavior
+# Layout and Responsive Design
 
-## Let content determine the layout
+## Composition
 
-Choose grid, columns, container width, and breakpoints from content and interaction needs. Avoid forcing one breakpoint system across unrelated pages when the project already has established rules. Use CSS grid/flexbox and intrinsic sizing before adding viewport-specific exceptions.
+- **Responsive grid architecture** — a real grid system (CSS Grid or a utility framework's grid), not ad hoc absolute positioning.
+- **Asymmetry when purposeful** — justified by content weight or hierarchy, not decoration for its own sake. At higher `DESIGN_VARIANCE`, asymmetric layouts (offset overlaps, mixed aspect ratios, fractional-unit grids) collapse to a strict single column below ~768px regardless of level.
+- **Editorial composition** — large type and generous negative space as the layout itself, when the mode (Read/Experience) and brief call for it.
+- **Section rhythm and visual pacing** — vary section height and density deliberately rather than repeating one template block down the page.
+- **Alignment systems** — pick a consistent alignment logic (edge-aligned, centered, baseline-grid) and keep it; wandering alignment reads as unintentional.
+- **Container widths, whitespace, information density** — tie to `VISUAL_DENSITY` from the design brief.
+- **Section transitions and visual storytelling** — how one section hands off to the next (a color shift, an overlap, a full-bleed break) should feel considered, especially on Persuade/Experience surfaces.
+- **Content hierarchy** — one clear primary action/message per section; avoid competing focal points.
 
-Maintain logical source order. If visual order changes at a breakpoint, ensure keyboard and screen-reader reading order remains coherent. Keep navigation, action controls, and form labels available at narrow widths without relying on hover.
+## Patterns to default away from (not ban)
 
-## Plan responsive states
+These are over-represented defaults, not forbidden patterns — use them when they are genuinely the right tool, state that choice, and don't reach for them reflexively:
 
-Inspect at least one narrow phone, one intermediate or breakpoint-adjacent width, and one wide desktop for ordinary frontend work. When responsive rules are part of the change or a visual release gate, use the supplied matrix as a default sample: 320, 375, 390, 768, 1024, 1280, and 1440 CSS pixels. Add widths when a real breakpoint, content edge, or device class requires them.
+- **The identical 3-equal-column feature-card row** as the default way to present three features. A 2-column zigzag, an asymmetric grid, a scroll-pinned sequence, or a horizontal-scroll strip are alternatives worth considering — but if the user explicitly wants three equal cards, or it's genuinely the clearest layout for the content, build it. See the priority hierarchy.
+- **Zigzag alternation beyond 2 consecutive rows** — a third left/right-alternating row in a row starts to feel mechanical; break the pattern or vary the row content/size instead.
+- **An eyebrow label above every section** — keep eyebrows to roughly 1 per 2-3 sections so they retain meaning; skip section-number eyebrows (`00 / INDEX`, `002 · Capabilities`) in favor of plain-language labels.
+- **Decorative structural elements with no function** — hairline crosshair grids, rotated vertical agency-portfolio text, bottom-of-hero decoration strips (`BRAND. MOTION. SPATIAL.`) — fine when they organize real content or carry real navigation, generic when added purely to "feel designed."
+- **Scroll cues** (`Scroll ↓`, animated mouse-wheel icons) — usually unnecessary; a visible partial element at the fold communicates "more below" without a label.
+- **Decorative colored status dots** on nav items, list rows, or badges with no real state behind them.
 
-At each chosen width check:
+## Responsive behavior
 
-- overflow, clipping, overlap, and text wrapping;
-- navigation and visible primary action;
-- line length and heading scale;
-- image crop and layout stability;
-- touch reach and target spacing;
-- dense data, tables, and long labels;
-- sticky or fixed elements obscuring content.
+- Design and verify at minimum: 320, 375, 390, 768, 1024, 1280, 1440px.
+- Navigation collapses to a real mobile pattern (sheet, drawer, or simple stacked menu) with working focus management and Escape-to-close — not a desktop menu just shrunk.
+- Touch targets ≥ 44×44px (iOS HIG) / 48×48dp (Material) on touch-capable viewports.
+- Images and media reflow without cropping out the subject; use `object-fit` and art-direction (`<picture>`/`srcset`) rather than one fixed aspect ratio forced everywhere.
+- No horizontal scroll/overflow at any tested width unless it's an intentional horizontal-scroll component (and even then, the page itself shouldn't overflow).
+- Verify real user journeys at each breakpoint (can the primary action actually be completed on a 375px-wide screen with one hand), not just that the layout doesn't break.
 
-Do not claim a width was tested unless it was actually rendered or inspected.
+## Section/z-index hygiene
 
-## Reflow and input
-
-Support browser zoom and text growth. Let controls wrap or stack instead of shrinking tap targets or clipping labels. Provide a non-hover path for hover content. Do not assume every touch device is small or every desktop device has a mouse; use capability queries only when they improve interaction.
-
-## Images and media
-
-Use responsive sources and appropriate dimensions when the stack supports them. Give important images useful alternative text; mark purely decorative images accordingly. Preserve focal subjects at all breakpoints. Avoid autoplay or heavy media that blocks the main task.
-
-## Layout acceptance
-
-Accept a responsive layout when content remains readable, controls remain operable, task priority remains clear, and no important content is hidden or overlapped at the checked widths. Record the actual widths and devices inspected.
+Keep z-index to a documented, small scale reserved for genuinely systemic layers (sticky nav, modal/overlay, toast, grain/texture overlay). Avoid scattering arbitrary `z-10`/`z-50` values through component code as a reflexive fix for stacking issues — trace the actual stacking context instead.

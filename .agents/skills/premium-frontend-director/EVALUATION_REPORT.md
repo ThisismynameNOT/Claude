@@ -1,39 +1,32 @@
 # Evaluation report
 
-**Release:** 1.0.0  
-**Evaluation date:** 2026-10-10
+**Release:** 2.0.0  
+**Evaluation date:** 2026-10-11
 
-## Source scope
+## Scope
 
-The available attachment was the `MASTER PROMPT: BUILD THE ULTIMATE PREMIUM FRONTEND DESIGN SKILL` text. It refers to a separate Markdown document titled “Premium Frontend Design,” but that separate source document was not present in the provided attachment. This audit and package therefore cover the supplied master prompt and current upstream/documentation checks, not the absent document.
-
-## Specification audit
-
-- **Keep:** the four interface modes, authentic business content, project-contract preservation, responsive/browser review, reduced-motion support, and the craft → critique → audit → polish → distill sequence.
-- **Make contextual:** the three dials are optional ordinal prompts, animation tools are selected by interaction needs, and the seven requested widths are a sample matrix rather than a mandatory test set for every small change.
-- **Resolve conflicts:** user-provided design constraints and reference fidelity outrank anti-generic preferences; project behavior and accessibility outrank stylistic polish; high-level score totals cannot cancel hard failures.
-- **Consolidate:** overlapping design, component, responsive, and QA rules are split between a short router, ten references, and seven task workflows.
-- **Add:** evidence/confidence labels, content and asset provenance, field-vs-lab performance reporting, scoped refinement, read-only audit behavior, and explicit not-tested reporting.
+This release merges the expanded multi-file skill package into the existing Claude/Codex GitHub package. It adds repository-aware research instructions and commercial-readiness guidance for ambitious client work. It does not build or deploy a website.
 
 ## Checks run
 
-- Read the full supplied master prompt and mapped its requirements into the router, references, workflows, examples, evaluations, and delivery documentation.
-- Reviewed the current upstream pages for Emil Kowalski's skills, Impeccable, and Taste Skill; recorded their licenses and scope in `ATTRIBUTION.md`.
-- Reviewed Anthropic's [Claude skill documentation](https://code.claude.com/docs/en/skills) and [custom-skill packaging guidance](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills), [WCAG 2.2](https://www.w3.org/TR/WCAG22/), [WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/), [MDN reduced-motion guidance](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion), and [web.dev Core Web Vitals](https://web.dev/articles/vitals).
-- Ran the skill creator's quick validator against this folder; exit code 0, output `Skill is valid!`.
-- Checked 31 local Markdown links across 27 Markdown files; all resolved.
-- Counted `SKILL.md` at 87 lines, below the 500-line limit.
-- Created `premium-frontend-director.zip`; verified ZIP integrity, all 28 source files are present, and every archive path begins with `premium-frontend-director/`.
+- Verified the supplied ZIP archive with Python's ZIP integrity check. It contains 26 files and 31 total entries; its content was extracted with path checks before review.
+- Checked 92 local Markdown links across 30 Markdown files; all resolved.
+- Checked the skill frontmatter name and description, counted `SKILL.md` at 103 lines (below 500), and checked the Codex metadata shape. The quoted short description is 46 characters, and its invocation prompt names `$premium-frontend-director`.
+- Forward-read the skill against a realistic Czech construction lead-generation brief with an existing CMS. The review found that an existing CMS alone could misleadingly suggest a redesign; Step 5 now explicitly distinguishes a new surface from replacing an existing interface. A follow-up confirmed the updated routing is clear and asks about evolution vs. overhaul only if an existing UI is present and scope remains unclear.
+- Preserved the previous package's 1.0 evaluation report as `EVALUATION_REPORT_1.0.md`.
+- Inspected the repository deployment workflow path filters before preparing the skill-only change. The skill paths are outside the observed website deployment filters.
 
-These are structural/package checks. Do not interpret them as proof of behavioral quality in Claude.
+These checks verify package structure and instruction routing. The forward-read was not a live Claude or Codex runtime test.
 
 ## Not run
 
-- No Claude runtime was available to measure activation precision or compare output with a no-skill baseline.
-- No website was built with this skill, so no browser, keyboard, screen-reader, responsive, accessibility, SEO, or performance outcome is claimed.
-- The three representative scenarios and reference-fidelity test are specified in `evaluations/activation-tests.md` for future behavioral evaluation.
+- No actual Claude/Codex session was used to measure activation precision or compare results against a no-skill baseline.
+- No live website was built, changed, or deployed. No browser, keyboard, screen-reader, SEO, accessibility, responsive, or performance result is claimed.
+- No specific external repository was evaluated for a client project in this release. The new GitHub guide defines how a future task should select, assess, and report repository evidence.
+- No price, revenue, conversion lift, or ROI was measured or guaranteed. “$10k+ quality” is a scope and delivery target, not a valuation.
 
-## Known limitations
+## Known limits
 
-- The referenced original “Premium Frontend Design” document was missing, so the review cannot compare its specific rules against the new package.
-- WCAG and Core Web Vitals are targets and evaluation references; the skill cannot guarantee conformance or field metrics without actual testing and evidence.
+- The package has no declared open-source license. `ATTRIBUTION.md` and the README retain that limitation; no new package license is asserted.
+- Repository popularity or visual references cannot establish suitability for a brand or prove professional quality. Future use must inspect the actual source, relevant commit, license, and project constraints.
+- Skill instructions can guide verification but cannot prove that a future implementation passes checks until the project is actually tested.

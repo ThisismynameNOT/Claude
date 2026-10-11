@@ -1,23 +1,41 @@
-# Content and brand authenticity
+# Content and Brand Authenticity
 
-## Source every claim
+Load this for any project representing a real business, person, or organization. This is a hard-gate section (see SKILL.md's mandatory quality gates) — violations here aren't a style preference, they're the difference between a demo and a misrepresentation.
 
-For a real business, use facts supplied by the user or verified from a trustworthy official source. Do not invent clients, completed work, reviews, certifications, staff, awards, addresses, service areas, numbers, guarantees, or years of experience. A plausible detail is still a false claim if it is unverified.
+## Prohibited, for real businesses
 
-Keep an evidence note for claims that affect trust or a purchase decision. If the user has not supplied a needed detail, use neutral copy, omit it, or mark it as a placeholder to verify. Do not ship placeholder content that looks like a real claim.
+Never invent, for a real company/person:
 
-## Images and rights
+- Clients or customer names/logos
+- Completed projects or case studies
+- Certifications, licenses, or accreditations
+- Statistics, metrics, or performance numbers
+- Testimonials or quotes attributed to named (or named-sounding) people
+- Company addresses, phone numbers, or registration details
+- Team members, titles, or bios
+- Portfolio photographs that aren't actually this company's work
+- Awards or business claims ("award-winning," "#1 in the region") without a verifiable source
 
-Prioritize user-owned, licensed, or verified official assets. Record source and rights status for commercial use. Reference photos may guide mood or composition but do not prove that a business completed the depicted work. Use clearly identified stock/placeholder images when authentic content is unavailable.
+## What to do instead
 
-Give meaningful imagery accurate alt text; use empty alt for decorative images. Preserve captions, author/source credits, and required license notices where applicable.
+- **Use what the user actually provides** — their own photos, their own copy, their real project list, their real contact details.
+- **Use verified official sources** when research tools are available (the company's own site, business registries, public filings) — and only what was actually looked up, not what seems plausible.
+- **When a needed asset is missing**, use one of: a clearly-licensed stock/generated placeholder visibly treated as a placeholder (not dressed up to look like a real company photo), or a labeled gap ("awaiting project photography — replace before launch").
+- **Record provenance** for production work: where each asset came from, its license, and anything still needing the client's verification, so the person deploying the site knows what to check before it goes live.
+- **A nice-looking reference photo is not evidence of the company's work.** Don't let an attractive stock image stand in as an implied claim ("here's a project we did") — either it's labeled as illustrative or it's the company's real work.
+- **If research tools aren't available**, don't pretend information was verified. Say plainly what's assumed/placeholder vs. confirmed.
 
-## Voice and localization
+## Visually-driven businesses (construction, architecture, photography, hospitality, etc.)
 
-Preserve supplied brand names, facts, and approved claims. Match tone to audience and industry without slipping into generic slogans. Localize dates, currency, addresses, phone formats, forms, and language-specific typography. Do not use machine-translated content as final copy without review when accuracy matters.
+Real project material is a primary input to the art direction here, not an afterthought layered onto a generic template:
 
-For Czech/Slovak audiences, check diacritics, inflection, and native wording. Do not translate legal, technical, or regulated claims casually.
+- Build project/case-study pages and galleries structured around the real material provided (or explicitly marked placeholder where it isn't yet available).
+- Let the real work's actual character (material palette, scale, setting) inform the typography and color system, rather than imposing a generic "premium" look regardless of what the photos show.
+- Where the user supplies a contact/company-registry discrepancy (two different phone numbers, an old vs. current address), flag it rather than silently picking one — put the decision back to the person who can actually confirm it.
 
-## Production handoff
+## Copy
 
-List unresolved content, asset, and rights checks explicitly. Separate verified production content from proposed copy so a reviewer can approve the right items.
+- No generic placeholder names ("John Doe," "Jane Smith," "Acme Corp") in anything that reads as real content — if a name is needed and none was given, either leave an explicit placeholder marker or ask.
+- No fake-perfect numbers (round, suspiciously clean stats) presented as real data.
+- Avoid filler marketing verbs as a crutch ("elevate," "seamless," "unlock," "revolutionize") when a concrete, specific claim would do more work.
+- Write in the business's actual voice where one exists (from their existing site/materials); don't overwrite an established brand voice during a visual refresh unless a copy rewrite was actually requested.

@@ -1,26 +1,20 @@
-# Create a frontend
+# Workflow: Create
 
-## Inputs
+**Activates when**: building a new site/app/surface from a brief, with little or no existing implementation to preserve.
 
-Use the brief, product or company facts, source content, assets, target stack, and any design constraints supplied by the user. Inspect the current repository before scaffolding when one exists.
+## Steps
 
-## Procedure
+1. Run SKILL.md Steps 1-4 in full: understand the project, set mode(s), set the dials, write the internal design brief — including the signature visual element. Don't skip to code with an implicit brief in your head; make the decisions explicit so later critique/audit stages have something concrete to check against.
+2. Choose the stack per [references/frontend-engineering.md](../references/frontend-engineering.md) — honor any constraint the user already stated (framework, hosting, CMS); otherwise pick the simplest stack that serves the brief.
+3. Build information architecture before visual design: page/section list, primary nav, the one or two primary actions per page.
+4. Build the design system first (tokens: type scale, color, spacing, radii, motion curves/durations) then compose pages from it — not the reverse. This is what keeps 6+ sections from drifting into visually unrelated blocks.
+5. Build real content where it's available (see [references/content-and-brand-authenticity.md](../references/content-and-brand-authenticity.md)); mark placeholders explicitly where it isn't.
+6. Implement with the production-grade baseline from [references/frontend-engineering.md](../references/frontend-engineering.md) — don't treat accessibility, responsive behavior, or error handling as a later pass bolted onto a "done" visual build.
+7. Run the full verification loop: [references/review-and-audit.md](../references/review-and-audit.md) — visual QA at all viewports, then the five-stage craft → critique → audit → polish → distill pass.
 
-1. Identify audience, primary outcome, user tasks, content, routes, integrations, locales, and constraints. Record unknown facts without inventing them.
-2. Select one or more interface modes. For a business site, distinguish conversion pages from project storytelling and functional forms.
-3. Write a compact design brief from [design-direction](../references/design-direction.md). Pick a project-specific signature element grounded in real material.
-4. Map routes, content hierarchy, components, and interaction states. Choose tokens and assets that work together; respect the existing stack.
-5. Implement core structure and responsive behavior first. Add motion only when it communicates a useful state or spatial relationship.
-6. Run relevant project checks. Render representative mobile and desktop pages and primary journeys when tools permit; fix observed issues and perform one bounded confirmation.
+## Acceptance criteria
 
-## Deliver
-
-Provide the working implementation, design rationale, changed routes and states, actual verification performed, assumptions, and unresolved content/asset needs.
-
-## Acceptance
-
-- Main user tasks and navigation work.
-- Content is accurate or clearly marked for verification.
-- Layout works at representative widths and input methods.
-- Required form, error, loading, and empty states exist.
-- No test or performance outcome is claimed unless measured.
+- The internal design brief exists and the shipped build matches it (or deviations are explained).
+- No mandatory quality gate (SKILL.md) is failing.
+- The signature visual element is actually specific to this project, not a repeated house move.
+- QA ran and was reported honestly, including what wasn't verifiable in this environment.

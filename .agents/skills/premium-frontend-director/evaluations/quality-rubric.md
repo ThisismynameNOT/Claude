@@ -1,39 +1,48 @@
-# Quality rubric
+# Quality Rubric
 
-Use only when a scored review is useful. Rate each applicable category 1–5, cite evidence, and mark unavailable evidence **unscored**. Adjust weights for the product mode when justified; never hide a hard failure in a weighted total.
+A weighted, evidence-based scoring model for evaluating a build this Skill produced. Scores are assigned from what was actually observed (real inspection, real test runs) — never invented for a check that wasn't performed; an unperformed check is reported as "not evaluated," not scored.
 
-| Category | Default weight | Evidence to review |
-|---|---:|---|
-| Art direction and originality | 20% | Fit to brand/audience, specific visual rationale, lack of arbitrary decoration |
-| Usability and information architecture | 15% | Task clarity, hierarchy, navigation, error recovery |
-| Visual coherence and typography | 15% | Consistent type, color, spacing, component language |
-| Motion and interaction quality | 10% | Purpose, input support, interruption, reduced motion |
-| Responsive implementation | 10% | Checked widths, reflow, overflow, interaction adaptation |
-| Accessibility | 10% | Semantics, keyboard, focus, contrast, errors, reduced motion |
-| Engineering quality and performance | 10% | Preserved contracts, maintainability, measured/runtime evidence |
-| Content authenticity and business effectiveness | 10% | Verified claims/assets, clear user value and primary action |
+## Weights (initial defaults — adjust per surface mode, see below)
 
-## Rating anchors
+| Category | Weight |
+|---|---:|
+| Art direction and originality | 20% |
+| Usability and information architecture | 15% |
+| Visual coherence and typography | 15% |
+| Motion and interaction quality | 10% |
+| Responsive implementation | 10% |
+| Accessibility | 10% |
+| Engineering quality and performance | 10% |
+| Content authenticity and business effectiveness | 10% |
 
-- **1 — Fails:** blocks a key task or lacks evidence for a required dimension.
-- **2 — Weak:** substantial defects or inconsistencies remain.
-- **3 — Adequate:** works for the main case, with material gaps or limited coverage.
-- **4 — Strong:** coherent and well verified, with only localized improvement needs.
-- **5 — Excellent:** unusually clear, robust, distinctive, and supported by broad relevant evidence.
+### Mode-based weight adjustment
 
-Do not score based on screenshots alone when functionality is in scope. Do not treat the absence of measured field data as proof of poor performance; mark it unscored or state that only lab evidence exists.
+These are starting weights for a Persuade surface. Adjust per mode:
 
-## Hard gates outside the score
+- **Operate**: usability/IA and accessibility rise (to roughly 20-25% each); art direction/originality falls (to roughly 5-10%) — a dashboard is scored on whether it's fast and clear to use, not on how distinctive it looks.
+- **Read**: visual coherence/typography rises; motion falls close to 0% — most Read surfaces should have little to no decorative motion.
+- **Experience**: art direction/originality rises (to 25-30%); engineering/performance still matters fully (an immersive portfolio that's slow has failed regardless of its art direction).
 
-Report separately and do not average away:
+State which weighting was used when reporting a score.
 
-- security, privacy, or data-integrity issue;
-- core task or route broken;
-- fabricated business claim or unauthorized asset;
-- keyboard-inaccessible essential interaction;
-- critical content obscured, clipped, or unavailable;
-- known severe motion or flashing hazard.
+## Hard-failure override
 
-## Report format
+**Critical findings (per [references/review-and-audit.md](../references/review-and-audit.md)) override the weighted score entirely.** A build with a 9/10 weighted score and one unresolved critical accessibility blocker, broken core functionality, or a content-authenticity violation is not a 9/10 build — report it as failing, with the critical finding named first, regardless of how the weighted categories score.
 
-State scope and evidence, then category ratings with a short rationale, hard gates, unscored areas, and prioritized next actions. If weights change, show the revised weights. If no meaningful evidence exists, provide findings without a numeric total.
+## Scoring discipline
+
+- Score only what was actually evaluated. If accessibility wasn't actually tested (no screen-reader pass, no axe/Lighthouse run), say "not evaluated" for that category rather than guessing a plausible-sounding number.
+- Separate hard, testable failures (a contrast ratio that measurably fails WCAG AA, a Lighthouse score that was actually run) from subjective design judgment (whether the hero composition is "distinctive enough") — label each finding as one or the other.
+- A score is a communication tool, not a target to game. If a build scores well across every category but still feels generic, trust the qualitative read and say so — the rubric is a check on blind spots, not a replacement for judgment.
+
+## Using this rubric
+
+Apply it at the end of [workflows/audit.md](../workflows/audit.md) or as the final step of the five-stage refinement pass in [references/review-and-audit.md](../references/review-and-audit.md). Report scored categories with their evidence, "not evaluated" categories explicitly, and any critical override prominently at the top.
+
+## Commercial-value boundary
+
+This rubric evaluates observed implementation quality. It does not estimate a website's sale price, client willingness to pay, revenue, or ROI. For premium-budget work, use [commercial-readiness.md](../references/commercial-readiness.md) to review scope, business context, acceptance criteria, and handoff. Do not convert the weighted score into a dollar valuation.
+
+## GitHub-evidence boundary
+
+GitHub references can support decisions about implementation patterns, tests, and maintenance practices. They do not prove a design is professionally suitable for this brand. Cite the exact source and commit/ref, verify license status, and report how the pattern was adapted.
