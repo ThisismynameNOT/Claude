@@ -1,7 +1,0 @@
-interface:
-  display_name: "Premium Frontend Director"
-  short_description: "Build and verify premium, repo-aware frontends"
-  default_prompt: "Use $premium-frontend-director to build or refine this frontend with project-specific direction, GitHub evidence, and honest quality checks."
-
-policy:
-  allow_implicit_invocation: true
