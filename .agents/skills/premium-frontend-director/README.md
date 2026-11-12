@@ -4,13 +4,13 @@ A portable Agent Skill for creating, redesigning, refining, animating, implement
 
 ## Install
 
-The GitHub repository keeps matching copies in both supported locations:
+This repository keeps ONE complete canonical skill package plus a lightweight Claude Code discovery adapter:
 
-- **Codex:** `.agents/skills/premium-frontend-director/` — invoke with `$premium-frontend-director` or select it from `/skills`.
-- **Claude Code:** `.claude/skills/premium-frontend-director/` — invoke with `/premium-frontend-director` or let Claude Code select it when the task matches.
+- **Canonical / Codex:** `.agents/skills/premium-frontend-director/` — full source, references, workflows, evaluations. Invoke locally with `$premium-frontend-director` or select it from `/skills`.
+- **Claude Code (in this repository):** `.claude/skills/premium-frontend-director/SKILL.md` — a lightweight adapter which loads the canonical skill above. Invoke with `/premium-frontend-director`.
 - **Other Agent Skills-compatible tools:** install the folder in the documented skills directory for that tool. Discovery paths vary.
 
-Keep the full directory structure so the skill can load its workflows, examples, evaluations, and references. If you edit the skill, update both GitHub copies together.
+Edit only the canonical `.agents/skills/premium-frontend-director/` package. There is no mirrored full copy. For standalone Claude Code installation outside this repository, copy the **whole canonical directory** into the target project's `.claude/skills/premium-frontend-director/`; a lone adapter is insufficient. The adapter works only while the complete repository is available.
 
 ## Use
 
